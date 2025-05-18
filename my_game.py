@@ -1,62 +1,81 @@
 import sys
 
-import pygame  # импортируем библиотеку pygame
-from random import *
+import pygame # импортируем библиотеку pygame
 
-class Food():
-    def __init__(self, name_image, x, y):  # конструктор, создание свойств, self - ОБЪЕКТ
+pygame.init()
+class Sprites():
+    def __init__(self, name_image, x, y):  # конструктор, создание свойств
         self.image = pygame.image.load(name_image)  # создание картинки, ЭТО СВОЙСТВО
         self.rect = self.image.get_rect()  # создание прямямоугольника по границам картинки, ЭТО СВОЙСТВО
         self.rect.x = x  # координата x для картинки, ЭТО СВОЙСТВО
-        self.rect.y = y # координата y для картинки, ЭТО СВОЙСТВО
+        self.rect.y = y  # координата y для картинки, ЭТО СВОЙСТВО
+
 
     def draw_image(self):  # метод отрисовки картинки
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
-    def move_plate(self): #метод движения тарелки
-        keys = pygame.key.get_pressed() #получение списка нажатых клавишь
-        if keys[pygame.K_LEFT] == True:#если нажата клавиша влево
-            self.rect.x -= 10
-        if keys[pygame.K_RIGHT]:#если нажата клавиша вправо
-            self.rect.x += 10
+    def move_Hunter(self):
+        keys = pygame.key.get_pressed() # получение списка нажатых клавиш
+        if keys[pygame.K_LEFT] == True: # если нажата клавиша влево
+            self.rect.x -= 5
+        if keys [pygame.K_RIGHT]: # если нажата клавиша вниз
+            self.rect.x += 5
+        if keys [pygame.K_UP]: # если нажата клавиша вниз
+            self.rect.y -= 5
+        if keys [pygame.K_DOWN]: # если нажата клавиша вниз
+            self.rect.y += 5
 
-    def move_food(self):#метод движения eды
-         self.rect.y += 9
+    def move_monster(self):
+        self.rect.y += 5
 
-fon = Food("fon.jpg", 0, 0)#СОЗДАНИЕ ФОНА
-pygame.init()  # обязательная команда
-window_size = (1420, 780)  # размеры окна
+
+
+
+fon = Sprites("Лес.png", 0, 0)# создание фона
+
+window_size = (1000, 750)  # размеры окна
 screen = pygame.display.set_mode(window_size)  # создание экрана с размерами
-monster1= Food("дверь.png", 300, 650)  # создание объекта класса Food
-monster2= Food("монстр1.png", 200, randint(-1000,0))  # создание объекта класса Food
-monster3 = Food("монстр2.png", 450, randint(-490,0))  # создание объекта класса Food
-monster4 = Food("монстр3.png", 650, randint(-700,0))  # создание объекта класса Food
-monster5 = Food("монстр4.png", 850,randint(-250,0) )  # создание объекта класса Food
-
-food_list = [monster2, monster3, monster4, monster5]
-
+Rendel = Sprites("Rendel1.png", 200, 240)  # создание объекта класса Sprites
+Hunter = Sprites( "Hunter1.png", 450, 550) # создание объекта класса Sprites
+Salivan = Sprites( "Salivan1.png", 500, 0) # создание объекта класса Sprites
+Crystal = Sprites( "Crystal.png", 450, 0) # создание объекта класса Sprites
+speed_Rendel = -5
+speed_Salivan = 5
 
 clock = pygame.time.Clock()  # создание игрового таймера
 
 while True:  # игровой цикл
-    clock.tick(20)  # 40фпс\с
-    fon.draw_image()  # применение метода отрисовки к объекту класса Food
-    for i in food_list:
-        i.draw_image()
-        i.move_food()
-        if monster1.rect.colliderect(i.rect):
-            food_list.remove(i)
-        if i.rect.y > 700:
-           i.rect.y=0
-    if food_list == []:
-        fon = Food("ура.jpg", 200, 200)  # СОЗДАНИЕ ФОНА
-        monster1.rect.y = -100
-        monster1.rect.x = -100
-    monster1.draw_image()  # применение метода отрисовки к объекту класса Food
-    monster1.move_plate()
+    fon.draw_image()
+    Rendel.rect.x += speed_Rendel
+    if Rendel.rect.x >= 750 or Rendel.rect.x <= 0:
+        speed_Rendel *= (-1)
+
+    Salivan.rect.x += speed_Salivan
+    if Salivan.rect.x >= 750 or Salivan.rect.x <= 0:
+        speed_Salivan *= (-1)
+
+    if Hunter.rect.colliderect(Rendel.rect) or Hunter.rect.colliderect(Salivan.rect):
+        Hunter.rect.x = 450
+        Hunter.rect.y = 550
+
+    if Hunter.rect.colliderect(Crystal.rect):
+        fon = Sprites("УРА1.jpg", 100, 0)  # создание фона
+        Rendel.rect.x = -450
+        Rendel.rect.y = -550
+        Salivan.rect.x = -450
+        Salivan.rect.y = -550
+        speed_Rendel=0
+        speed_Salivan=0
+        Hunter.rect.y = -100
+
+    clock.tick(40)  # 40фпс\с
+
+    Crystal.draw_image()
+    Rendel.draw_image()
+    Salivan.draw_image()
+    Hunter.draw_image()
+    Hunter.move_Hunter()
+    pygame.display.update()  # обновление содержимого экрана
     for event in pygame.event.get():  # проходимся по событиям
         if event.type == pygame.QUIT:  # если нажали на крестик
-            sys.exit() # выход из игры
-    pygame.display.update()# обновление содержимого экрана
-
-
+            sys.exit()  # выход из игры
